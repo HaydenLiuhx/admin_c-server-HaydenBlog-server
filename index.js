@@ -1,28 +1,35 @@
 const express = require('express')
 //const app = express()
 //const jwt = require('jsonwebtoken')
-const UserModel = require('./Usermodels')
+const UserModel = require('./Usermodel')
+const CategoryModel = require('./Categorymodel')
+const ProductModel = require('./Productmodel')
+const RoleModel = require('./Rolemodel')
+
 const mongoose = require('mongoose')
 const md5 = require('blueimp-md5')
 //const SECRET = 'Hayden'
 // 得到路由器对象
 const router = express.Router()
 
-//app.use(express.json())
-router.get('/api/users', async (req, res) => {
-    try{
-    const users = await UserModel.find()
-    //res.send({status: 0, data: {users, roles}})
-    res.send({status: 0, data: users})
-    } catch {
-        (error => {
+//获取所有用户列表
+router.get('/api/users', (req, res) => {
+    
+    UserModel.find()
+        .then(users => {
+            RoleModel.find().then(roles => {
+                res.send({status: 0, data: {users, roles}})
+            })
+        })
+        .catch(error => {
         console.error('获取用户列表异常', error)
         res.send({status: 1, msg: '获取用户列表异常, 请重新尝试'})
       })
 
-    }
+    
 })
 
+//注册
 router.post('/api/register', async (req, res) => {
     const user = await UserModel.create({
         username: req.body.username,
@@ -32,10 +39,13 @@ router.post('/api/register', async (req, res) => {
     res.send(user)
 })
 
+//登录
 router.post('/api/login', async (req, res) => {
     //check user isavailable?
     try {
         const { username, password } = req.body
+        console.log(req.body)
+        console.log(req.query)
         // 根据username和password查询数据库users, 如果没有, 返回提示错误的信息, 如果有, 返回登陆成功信息(包含user)
         UserModel.findOne({ username, password: md5(password) })
             .then(user => {
@@ -78,5 +88,58 @@ router.post('/api/login', async (req, res) => {
 //     })
 //     res.send(orders)
 // })
+
+// 添加分类
+router.post('/api/manage/category/add', (req, res) => {
+    const {categoryName, parentId} = req.body
+    CategoryModel.create({name: categoryName, parentId: parentId || '0'})
+      .then(category => {
+        res.send({status: 0, data: category})
+      })
+      .catch(error => {
+        console.error('添加分类异常', error)
+        res.send({status: 1, msg: '添加分类异常, 请重新尝试'})
+      })
+  })
+  
+  // 获取分类列表
+  router.get('/api/manage/category/list', (req, res) => {
+    const parentId = req.query.parentId || '0'
+    CategoryModel.find({parentId})
+      .then(categorys => {
+        res.send({status: 0, data: categorys})
+      })
+      .catch(error => {
+        console.error('获取分类列表异常', error)
+        res.send({status: 1, msg: '获取分类列表异常, 请重新尝试'})
+      })
+  })
+  
+  // 更新分类名称
+  router.post('/api/manage/category/update', (req, res) => {
+    const {categoryId, categoryName} = req.body
+    CategoryModel.findOneAndUpdate({_id: categoryId}, {name: categoryName})
+      .then(oldCategory => {
+        res.send({status: 0,data:oldCategory})
+      })
+      .catch(error => {
+        console.error('更新分类名称异常', error)
+        res.send({status: 1, msg: '更新分类名称异常, 请重新尝试'})
+      })
+  })
+
+  //删除分类
+  router.post('/api/manage/category/delete', (req, res) => {
+    const {categoryId} = req.query
+    
+    CategoryModel.deleteOne({_id: categoryId})
+    .then((doc) => {
+      res.send({status: 0})
+    })
+})
+
+
+
+
 
 module.exports = router

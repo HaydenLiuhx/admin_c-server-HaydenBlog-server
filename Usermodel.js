@@ -10,7 +10,7 @@ const UserSchema = new mongoose.Schema({
 })
 const UserModel = mongoose.model('User', UserSchema)
 
-//User.db.dropCollection('users')
+//UserModel.db.dropCollection('users')
 
 // 初始化默认超级管理员用户: admin/admin
 UserModel.findOne({username: 'admin'}).then(user => {

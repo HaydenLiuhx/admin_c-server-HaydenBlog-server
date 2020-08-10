@@ -10,7 +10,7 @@ const express = require('express')
 const app = express() // 产生应用对象
 
 // 声明使用静态中间件
-//app.use(express.static('public'))
+app.use(express.static('public'))
 // 声明使用解析post请求的中间件
 app.use(express.urlencoded({extended: true})) // 请求体参数是: name=tom&pwd=123
 app.use(express.json()) // 请求体参数是json结构: {name: tom, pwd: 123}
@@ -39,6 +39,7 @@ mongoose.connect('mongodb://localhost:27017/react-backend', {
   .catch(error => {
     console.error('连接数据库失败', error)
   })
+  mongoose.set('useFindAndModify', false);
 
 
 // app.listen(4000,() => {
