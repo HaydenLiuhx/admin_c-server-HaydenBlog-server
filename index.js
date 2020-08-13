@@ -167,14 +167,16 @@ router.get('/api/manage/product/list', (req, res) => {
 })
 
 // 搜索产品列表
-router.get('api/manage/product/search', (req, res) => {
+router.get('/api/manage/product/search', (req, res) => {
   const {pageNum, pageSize, searchName, productName, productDesc} = req.query
   let contition = {}
+  console.log(req.query)
   if (productName) {
     contition = {name: new RegExp(`^.*${productName}.*$`)}
   } else if (productDesc) {
     contition = {desc: new RegExp(`^.*${productDesc}.*$`)}
   }
+  console.log(contition)
   ProductModel.find(contition)
     .then(products => {
       res.send({status: 0, data: pageFilter(products, pageNum, pageSize)})
