@@ -12,12 +12,12 @@ const UserModel = mongoose.model('User', UserSchema)
 
 //UserModel.db.dropCollection('users')
 
-// 初始化默认超级管理员用户: admin/admin
+// initialization of default super user: admin/admin
 UserModel.findOne({username: 'admin'}).then(user => {
     if(!user) {
       UserModel.create({username: 'admin', password: md5('admin')})
               .then(user => {
-                console.log('初始化用户: 用户名: admin 密码为: admin')
+                console.log('User initialization -> Username: admin; Password: admin')
               })
     }
   })

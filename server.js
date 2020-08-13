@@ -30,14 +30,14 @@ mongoose.connect('mongodb://localhost:27017/react-backend', {
     useUnifiedTopology: true,
     useCreateIndex: true
 }).then(() => {
-    console.log('连接数据库成功!!!')
-    // 只有当连接上数据库后才去启动服务器
+    console.log('Connect to db successfully!!!')
+    // Only start after connect
     app.listen('4000', () => {
-      console.log('服务器启动成功, 请访问: http://localhost:4000')
+      console.log('Server start, Please visit -> http://localhost:4000')
     })
   })
   .catch(error => {
-    console.error('连接数据库失败', error)
+    console.error('fail to connect db', error)
   })
   mongoose.set('useFindAndModify', false);
 

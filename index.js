@@ -138,8 +138,82 @@ router.post('/api/manage/category/add', (req, res) => {
     })
 })
 
+// 添加产品
+router.post('/api/manage/product/add', (req, res) => {
+  const product = req.query
+  // console.log('body', req.body)
+  // console.log('query', req.query)
+  ProductModel.create(product)
+    .then(product => {
+      res.send({status: 0, data: product})
+    })
+    .catch(error => {
+      console.error('添加产品异常', error)
+      res.send({status: 1, msg: '添加产品异常, 请重新尝试'})
+    })
+})
+
+// 获取产品分页列表
+router.get('/api/manage/product/list', (req, res) => {
+  const {pageNum, pageSize} = req.query
+  ProductModel.find({})
+    .then(products => {
+      res.send({status: 0, data: pageFilter(products, pageNum, pageSize)})
+    })
+    .catch(error => {
+      console.error('获取商品列表异常', error)
+      res.send({status: 1, msg: '获取商品列表异常, 请重新尝试'})
+    })
+})
+
+// 搜索产品列表
+router.get('api/manage/product/search', (req, res) => {
+  const {pageNum, pageSize, searchName, productName, productDesc} = req.query
+  let contition = {}
+  if (productName) {
+    contition = {name: new RegExp(`^.*${productName}.*$`)}
+  } else if (productDesc) {
+    contition = {desc: new RegExp(`^.*${productDesc}.*$`)}
+  }
+  ProductModel.find(contition)
+    .then(products => {
+      res.send({status: 0, data: pageFilter(products, pageNum, pageSize)})
+    })
+    .catch(error => {
+      console.error('搜索商品列表异常', error)
+      res.send({status: 1, msg: '搜索商品列表异常, 请重新尝试'})
+    })
+})
 
 
+
+
+
+/*
+得到指定数组的分页信息对象
+ */
+function pageFilter(arr, pageNum, pageSize) {
+  pageNum = pageNum * 1
+  pageSize = pageSize * 1
+  const total = arr.length
+  const pages = Math.floor((total + pageSize - 1) / pageSize)
+  const start = pageSize * (pageNum - 1)
+  const end = start + pageSize <= total ? start + pageSize : total
+  const list = []
+  for (var i = start; i < end; i++) {
+    list.push(arr[i])
+  }
+
+  return {
+    pageNum,
+    total,
+    pages,
+    pageSize,
+    list
+  }
+}
+
+require('./file-upload')(router)
 
 
 module.exports = router
