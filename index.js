@@ -153,7 +153,7 @@ router.get('/api/manage/category/info', (req, res) => {
 
 // 添加产品
 router.post('/api/manage/product/add', (req, res) => {
-  const product = req.query
+  const product = req.body
   // console.log('body', req.body)
   // console.log('query', req.query)
   ProductModel.create(product)
