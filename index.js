@@ -80,8 +80,8 @@ router.post('/api/login', async (req, res) => {
 // 添加用户
 router.post('/api/manage/user/add', (req, res) => {
   // 读取请求参数数据
-  const {username, password} = req.query
-
+  const {username, password} = req.body
+  console.log(req.body)
   // 处理: 判断用户是否已经存在, 如果存在, 返回提示错误的信息, 如果不存在, 保存
   // 查询(根据username)
   UserModel.findOne({username})
@@ -94,7 +94,7 @@ router.post('/api/manage/user/add', (req, res) => {
         })
       } else { // 没值(不存在)
         // 保存
-        return UserModel.create({...req.query, password: md5(password || 'admin')})
+        return UserModel.create({...req.body, password: md5(password || 'admin')})
       }
     })
     .then(user => {
